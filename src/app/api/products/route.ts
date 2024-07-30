@@ -5,6 +5,7 @@ import { desc } from 'drizzle-orm';
 import { unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
+// CREATE PRODUCTS
 export async function POST(request: Request) {
   // TODO : check user access
   const data = await request.formData();
@@ -42,6 +43,8 @@ export async function POST(request: Request) {
   return Response.json({ message: 'OK' }, { status: 201 });
 }
 
+
+// GET PRODUCTS
 export async function GET() {
  try {
    const allProducts = await db.select().from(products).orderBy(desc(products.id));
@@ -50,3 +53,5 @@ export async function GET() {
   return Response.json({message:'Failed to fetch products'},{status:500});
  }
 }
+
+// GET SINGLE PRODUCTS
