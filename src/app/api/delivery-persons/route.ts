@@ -3,7 +3,6 @@ import { deliveryPersons, warehouses } from '@/lib/db/schema';
 import { deliveryPersonSchema } from '@/lib/validators/deliveryPersonSchema';
 import { desc, eq } from 'drizzle-orm';
 
-
 // Create delivery person
 export async function POST(request: Request) {
   const requestData = await request.json();
@@ -24,21 +23,20 @@ export async function POST(request: Request) {
   }
 }
 
-
 // get delivery person
 export async function GET() {
   try {
-    const allDeliveryPersons = await db.select({
-        id:deliveryPersons.id,
-        name:deliveryPersons.name,
-        phone:deliveryPersons.phone,
-        warehouse:warehouses.name
-    }).from(deliveryPersons).leftJoin(warehouses, eq(deliveryPersons.warehouseId,
-        warehouses.id
-      ))
+    const allDeliveryPersons = await db
+      .select({
+        id: deliveryPersons.id,
+        name: deliveryPersons.name,
+        phone: deliveryPersons.phone,
+        warehouse: warehouses.name,
+      })
+      .from(deliveryPersons)
+      .leftJoin(warehouses, eq(deliveryPersons.warehouseId, warehouses.id))
       .orderBy(desc(deliveryPersons.id));
-    return Response.json(allDeliveryPersons)
-      
+    return Response.json(allDeliveryPersons);
   } catch (error) {
     return Response.json(
       { message: 'Failed to fetch the delivery person in database' },
