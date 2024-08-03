@@ -2,6 +2,8 @@ import { db } from '@/lib/db/db';
 import { products } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
+
+// GET SINGLE PRODUCTS
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   const id = params.id;
   try {

@@ -54,4 +54,3 @@ export async function GET() {
  }
 }
 
-// GET SINGLE PRODUCTS
