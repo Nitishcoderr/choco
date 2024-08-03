@@ -17,3 +17,12 @@ export async function POST(request:Request) {
         return Response.json({message:"Failed to store the delivery person in database"},{status:500})
     }
 }
+
+export async function GET(){
+    try {
+        const allDeliveryPersons = await db.select().from(deliveryPersons);
+        return Response.json(allDeliveryPersons);
+    } catch (error) {
+        return Response.json({message:"Failed to fetch the delivery person in database"},{status:500})
+    }
+}
