@@ -22,3 +22,12 @@ export async function POST(request:Request){
     }
 
 }
+
+export async function GET(request:Request){
+    try {
+        const allWarehouses = await db.select().from(warehouses);
+        return Response.json(allWarehouses);
+    } catch (error) {
+        return Response.json({message:"Failed to fetch all warehouse"},{status:500})
+    }
+}
