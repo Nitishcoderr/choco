@@ -25,12 +25,12 @@ import {
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const navItems = [
-    { label: 'Dashboard', href: '/admin', icon: HomeIcon },
-    { label: 'Products', href: '/admin/products', icon: Layers },
-    { label: 'Warehouses', href: '/admin/warehouse', icon: Warehouse },
-    { label: 'Delivery Persons', href: '/admin/delivery-persons', icon: Users },
-    { label: 'Orders', href: '/admin/orders', icon: ShoppingCart },
-    { label: 'Inventories', href: '/admin/inventories', icon: Blocks },
+    { label: 'Dashboard', href: '/admin', icon: HomeIcon , id:1 },
+    { label: 'Products', href: '/admin/products', icon: Layers , id:2 },
+    { label: 'Warehouses', href: '/admin/warehouse', icon: Warehouse , id:3 },
+    { label: 'Delivery Persons', href: '/admin/delivery-persons', icon: Users , id:4 },
+    { label: 'Orders', href: '/admin/orders', icon: ShoppingCart , id:5 },
+    { label: 'Inventories', href: '/admin/inventories', icon: Blocks,id:6 },
   ];
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
@@ -52,7 +52,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               className="flex flex-col">
               <nav className="grid gap-2 text-lg font-medium">
                 {navItems.map((item) => (
-                  <Link
+                  <Link key={item.id}
                     href={item.href}
                     className="flex items-center gap-2 text-lg font-semibold">
                     <item.icon className="h-4 w-4" />

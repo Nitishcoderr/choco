@@ -17,22 +17,22 @@ const Sidebar = () => {
 
     const navItems = [
         {label:"Dashboard",href:"/admin",
-            icon:HomeIcon
+            icon:HomeIcon,id:1
         },
         {label:"Products",href:"/admin/products",
-            icon:Layers
+            icon:Layers,id:2
         },
         {label:"Warehouses",href:"/admin/warehouse",
-            icon:Warehouse
+            icon:Warehouse,id:3
         },
         {label:"Delivery Persons",href:"/admin/delivery-persons",
-            icon:Users
+            icon:Users,id:4
         },
         {label:"Orders",href:"/admin/orders",
-            icon:ShoppingCart
+            icon:ShoppingCart,id:5
         },
         {label:"Inventories",href:"/admin/inventories",
-            icon:Blocks
+            icon:Blocks,id:6
         },
     ]
 
@@ -53,7 +53,7 @@ const Sidebar = () => {
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
                 {
                     navItems.map((item)=>(
-                        <Link
+                        <Link key={item.id}
                 href={item.href}
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
               >

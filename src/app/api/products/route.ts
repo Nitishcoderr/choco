@@ -1,6 +1,6 @@
 import { db } from '@/lib/db/db';
 import { products } from '@/lib/db/schema';
-import { productSchema } from '@/lib/db/validators/productSchema';
+import { productSchema } from '@/lib/validators/productSchema';
 import { desc } from 'drizzle-orm';
 import { unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
