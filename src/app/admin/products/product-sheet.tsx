@@ -24,6 +24,7 @@ const ProductSheet = () => {
         queryKey: ["products"],
       })
       alert("Product created")
+      onClose();
     }
   })
 
