@@ -9,10 +9,11 @@ import { getAllProducts } from '@/http/api';
 import { Product } from '@/types';
 import ProductSheet from './product-sheet';
 import { useNewProduct } from '@/store/product/product-store';
+import { Loader2 } from 'lucide-react';
 
 const ProductPage = () => {
   const {onOpen} = useNewProduct();
-  const {data:products} = useQuery<Product[]>({
+  const {data:products,isLoading} = useQuery<Product[]>({
     queryKey:["products"],
     queryFn:getAllProducts, 
   });
@@ -28,7 +29,12 @@ const ProductPage = () => {
       <Button onClick={onOpen} size={'sm'}>Add Product</Button>
       <ProductSheet/>
     </div> 
-    <DataTable columns={columns} data={products || []} />
+      {
+        isLoading ?( <div className='flex items-center justify-center'>
+          <Loader2 className='size-10 animate-spin'/>
+        </div> ): (<DataTable columns={columns} data={products || []} />)
+      }
+    
     </>
   )
 }
