@@ -21,3 +21,20 @@ export const createProduct = async (data:FormData)=>{
   });
   return response.data;
 }
+
+
+export const getAllWarehouses = async()=>{
+ try {
+   const response =  await api.get('/warehouses');
+   console.log(response.data);
+   return response.data;
+ } catch (error) {
+  console.log(error);
+ }
+}
+
+
+export const createWarehouses = async (data: { name: string; pincode: string })=>{
+  const response = await api.post('/warehouses',data);
+  return response.data;
+}
