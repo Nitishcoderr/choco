@@ -7,8 +7,8 @@ import { WareHouse } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import WareHousesSheets from './warehouses-sheets';
 import { Loader2 } from 'lucide-react';
-import { DataTable } from './data-table';
 import { columns } from './columns'
+import { DataTable } from '../products/data-table';
 
 
 

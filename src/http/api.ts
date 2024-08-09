@@ -38,3 +38,19 @@ export const createWarehouses = async (data: { name: string; pincode: string })=
   const response = await api.post('/warehouses',data);
   return response.data;
 }
+
+export const getAllDeliveryPerson = async()=>{
+  try {
+    const response =  await api.get('/delivery-persons');
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+   console.log(error);
+  }
+ }
+
+
+ export const createDeliveryPerson = async (data: { name: string; phone: string,warehouseId:number })=>{
+  const response = await api.post('/delivery-persons',data);
+  return response.data;
+}
