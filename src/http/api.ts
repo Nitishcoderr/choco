@@ -54,3 +54,14 @@ export const getAllDeliveryPerson = async()=>{
   const response = await api.post('/delivery-persons',data);
   return response.data;
 }
+
+
+export const getAllInventories = async()=>{
+  try {
+    const response =  await api.get('/inventories');
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+   console.log(error);
+  }
+ }
