@@ -2,14 +2,14 @@
 
 import { Button } from '@/components/ui/button';
 import React from 'react';
-import { columns } from './columns';
+import { columns } from './_components/columns';
 import { getAllDeliveryPerson } from '@/http/api';
 import { useQuery } from '@tanstack/react-query';
 import { DeliveryPersons } from '@/types';
 import { Loader2 } from 'lucide-react';
 import { useNewDeliveryPerson } from '@/store/deliveryPerson/deliveryPersonStore';
 import { DataTable } from '../_components/data-table';
-import DeliveryPersonSheets from './deliveryPersonSheet';
+import DeliveryPersonSheets from './_components/deliveryPersonSheet';
 
 const DeliveryPerson = () => {
   const { onOpen } = useNewDeliveryPerson();

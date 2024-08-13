@@ -5,10 +5,10 @@ import { getAllWarehouses } from '@/http/api';
 import { useNewWarehouses } from '@/store/warehouse/warehouse-store';
 import { WareHouse } from '@/types';
 import { useQuery } from '@tanstack/react-query';
-import WareHousesSheets from './warehouses-sheets';
 import { Loader2 } from 'lucide-react';
-import { columns } from './columns';
+import { columns } from './_components/columns';
 import { DataTable } from '../_components/data-table';
+import WareHousesSheets from './_components/warehouses-sheets';
 
 const WarehousesPage = () => {
   const { onOpen } = useNewWarehouses();
