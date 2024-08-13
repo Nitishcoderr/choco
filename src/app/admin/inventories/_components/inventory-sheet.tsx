@@ -8,27 +8,46 @@ import {
 } from '@/components/ui/sheet';
 import { useToast } from '@/components/ui/use-toast';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createDeliveryPerson } from '@/http/api';
-import { useNewDeliveryPerson } from '@/store/deliveryPerson/deliveryPersonStore';
-import CreateDeliveryPersonForm, { FormValues } from './create-deliveryPersonForm';
+import { createInventory } from '@/http/api';
+import { useNewInventory } from '@/store/inventory/inventory-store';
+import {  InventoryData } from '@/types';
+import   CreateInventoryForm, { FormValues } from './create-inventory-Form';
+
+
+
 
 const InventorySheets = () => {
   const { toast } = useToast();
-  const { isOpen, onClose } = useNewDeliveryPerson();
+  const { isOpen, onClose } = useNewInventory();
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
-    mutationKey: ['create-warehouse'],
-    mutationFn: createDeliveryPerson,
+    mutationKey: ['create-inventory'],
+    mutationFn:(data:InventoryData)=> createInventory(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['delivery-persons'],
+        queryKey: ['inventories'],
       });
       toast({
-        title: 'Delivery Person created successfully',
+        title: 'Inventories created successfully'
       });
       onClose();
     },
+    onError: (error: any) => {
+      if (error.response?.status === 400 && error.response?.data?.message === 'Inventory already exists') {
+        toast({
+          title: 'Error',
+          description: 'SKU already exists. Please use a different SKU.',
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: 'Failed to create inventory. Please try again later.',
+          variant: 'destructive',
+        });
+      }
+    }
   });
 
   const onSubmit = (values: FormValues) => {
@@ -42,10 +61,10 @@ const InventorySheets = () => {
       onOpenChange={onClose}>
       <SheetContent className="min-w-[28rem] space-y-4">
         <SheetHeader>
-          <SheetTitle>Create Delivery Person</SheetTitle>
-          <SheetDescription>Create a new Delivery Person</SheetDescription>
+          <SheetTitle>Create Inventory</SheetTitle>
+          <SheetDescription>Create a new Inventory</SheetDescription>
         </SheetHeader>
-        <CreateDeliveryPersonForm
+        <CreateInventoryForm
           onSubmit={onSubmit}
           disabled={isPending}
         />

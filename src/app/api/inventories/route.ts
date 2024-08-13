@@ -16,7 +16,10 @@ export async function POST(request:Request) {
      try {
         await db.insert(inventories).values(validateData);
         return Response.json({ message: "OK" }, { status: 201 });
-     } catch (error) {
+     } catch (error:any) {
+      if(error.code === '23505'){
+         return Response.json({ message: "Inventory already exists" }, { status: 400 });
+      }
         return Response.json({ message: "Failed to store the inventories" }, { status: 500 });
      }
 }

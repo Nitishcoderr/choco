@@ -1,7 +1,6 @@
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -9,49 +8,51 @@ import {
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { deliveryPersonSchema } from '@/lib/validators/deliveryPersonSchema';
 import { useQuery } from '@tanstack/react-query';
-import { WareHouse } from '@/types';
-import { getAllWarehouses } from '@/http/api';
+import { Product, WareHouse } from '@/types';
+import { getAllProducts, getAllWarehouses } from '@/http/api';
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { inventorySchema } from '@/lib/validators/inventoriesSchema';
 
-export type FormValues = z.input<typeof deliveryPersonSchema>;
+export type FormValues = z.input<typeof inventorySchema>;
 
-const CreateDeliveryPersonForm = ({
+const CreateInventoryForm = ({
   onSubmit,
   disabled,
 }: {
   onSubmit: (formValue: FormValues) => void;
   disabled: boolean;
 }) => {
-  const form = useForm<z.infer<typeof deliveryPersonSchema>>({
-    resolver: zodResolver(deliveryPersonSchema),
+  const form = useForm<z.infer<typeof inventorySchema>>({
+    resolver: zodResolver(inventorySchema),
     defaultValues: {
-      name: '',
-      phone: '',
+      sku: ''
     },
   });
 
   const {
     data: warehouses,
-    isLoading,
-    isError,
+    isLoading
   } = useQuery<WareHouse[]>({
     queryKey: ['wareHouse'],
     queryFn: async () => getAllWarehouses(),
+  });
+  const {
+    data: products,
+    isLoading: isLoadingProducts,
+  } = useQuery<Product[]>({
+    queryKey: ['products'],
+    queryFn: async () => getAllProducts(),
   });
 
   const handleSubmit = (values: FormValues) => {
@@ -66,29 +67,13 @@ const CreateDeliveryPersonForm = ({
         className="space-y-8">
         <FormField
           control={form.control}
-          name="name"
+          name="sku"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>SKU</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="e.g. Denny"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Phone</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="e.g. +917565069987"
+                  placeholder="e.g. CH123456"
                   {...field}
                 />
               </FormControl>
@@ -132,6 +117,42 @@ const CreateDeliveryPersonForm = ({
           )}
         />
 
+<FormField
+          control={form.control}
+          name="productId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Product ID</FormLabel>
+              <Select
+                onValueChange={(value) => field.onChange(parseInt(value))}
+                defaultValue={field.value ? field.value.toString() : ''}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Product ID" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {isLoadingProducts ? (
+                    <SelectItem value="Loading">Loading...</SelectItem>
+                  ) : (
+                    <>
+                      {products &&
+                        products.map((item) => (
+                          <SelectItem
+                            key={item.id}
+                            value={item.id ? item.id?.toString() : ''}>
+                            {item.name}
+                          </SelectItem>
+                        ))}
+                    </>
+                  )}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Button
           type="submit"
           className="w-full"
@@ -143,4 +164,4 @@ const CreateDeliveryPersonForm = ({
   );
 };
 
-export default CreateDeliveryPersonForm;
+export default CreateInventoryForm;

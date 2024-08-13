@@ -1,3 +1,4 @@
+import {  InventoryData } from "@/types";
 import { api } from "./client";
 
 export const getAllProducts = async()=>{
@@ -65,3 +66,8 @@ export const getAllInventories = async()=>{
    console.log(error);
   }
  }
+
+ export const createInventory = async (data: InventoryData)=>{
+  const response = await api.post('/inventories',data);
+  return response.data;
+}
