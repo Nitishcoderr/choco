@@ -26,7 +26,7 @@ const DeliveryPerson = () => {
       <h3 className='text-2xl  font-bold tracking-tight'>
         Delivery Person
       </h3>
-      <Button onClick={onOpen} size={'sm'}>Add Warehouse</Button>
+      <Button onClick={onOpen} size={'sm'}>Add Delivery Person</Button>
       <DeliveryPersonSheets/>
     </div> 
 
