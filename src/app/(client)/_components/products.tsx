@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import { getAllProducts } from '@/http/api';
 import { Product } from '@/types';
 import { useQuery } from '@tanstack/react-query';
@@ -10,8 +11,8 @@ import Link from 'next/link';
 import React from 'react';
 
 const Products = () => {
-
-    const {data:products} = useQuery({
+    const skeletons = Array.from({length:4})
+    const {data:products,isLoading} = useQuery({
         queryKey: ['products'],
         queryFn:getAllProducts,
         staleTime:10*1000,
@@ -26,7 +27,18 @@ const Products = () => {
           <Separator className="h-0.5 w-20 bg-brown-900" />
         </div>
         <div className="mt-20 grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {
+
+                        {isLoading  ?  <>
+                            {skeletons.map((_, i) => (
+                                <div key={i} className="flex h-full w-full flex-col gap-5">
+                                    <Skeleton className="aspect-square w-full rounded-md bg-brown-100" />
+                                    <Skeleton className="h-5 w-full rounded-md bg-brown-100" />
+                                    <Skeleton className="h-5 w-10 rounded-md bg-brown-100" />
+                                    <Skeleton className="h-8 w-full rounded-md bg-brown-100" />
+                                </div>
+                            ))}
+                        </> : <>
+                        {
                 products?.map((product:Product)=>
                     <div key={product.id} className="flex flex-col items-start justify-center gap-5">
                     <Image
@@ -54,6 +66,10 @@ const Products = () => {
                   </div>
                )
             }
+                        </>  }
+                      
+
+          
          
         </div>
       </div>
