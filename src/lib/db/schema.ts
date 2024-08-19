@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm';
+import { not, sql } from 'drizzle-orm';
 import { index, integer, pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
@@ -40,35 +40,37 @@ export const warehouses = pgTable(
   }
 );
 
-export const orders = pgTable(
-  'orders',
-  {
-    id: serial('id').primaryKey(),
-  },
-);
-
-
-
-export const deliveryPersons = pgTable(
-  'delivery_persons',
-  {
-    id: serial('id').primaryKey(),
-    name: varchar('name', { length: 100 }).notNull(),
-    phone: varchar('phone', { length: 13 }).notNull(),
-    warehouseId: integer('warehouse_id').references(()=>warehouses.id,{onDelete:"cascade"}),
-    orderId:integer("order_id").references(()=>orders.id,{onDelete:'set null'}),
-    updatedAt: timestamp('updated_at').default(sql`CURRENT_TIMESTAMP`),
-    createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
-  },
-);
-
-
-export const inventories = pgTable("inventories",{
-  id:serial('id').primaryKey(),
-  sku:varchar("sku",{length:8}).unique().notNull(),
-  orderId:integer("order_id").references(()=>orders.id,{onDelete:'set null'}),
-  warehouseId:integer("warehouse_id").references(()=>warehouses.id,{onDelete:'cascade'}),
-  productId:integer("product_id").references(()=>products.id,{onDelete:'cascade'}),
+export const orders = pgTable('orders', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id')
+    .references(() => users.id, { onDelete: 'cascade' })
+    .notNull(),
+  status: varchar('status', { length: 10 }).notNull(),
+  type: varchar('type', { length: 6 }).default('quick'),
+  price: integer('price').notNull(),
+  address: text('address').notNull(),
+  productId: integer('product_id').references(() => products.id, { onDelete: 'no action' }),
+  qty: integer('qty').notNull(),
   updatedAt: timestamp('updated_at').default(sql`CURRENT_TIMESTAMP`),
   createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
-})
+});
+
+export const deliveryPersons = pgTable('delivery_persons', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 100 }).notNull(),
+  phone: varchar('phone', { length: 13 }).notNull(),
+  warehouseId: integer('warehouse_id').references(() => warehouses.id, { onDelete: 'cascade' }),
+  orderId: integer('order_id').references(() => orders.id, { onDelete: 'set null' }),
+  updatedAt: timestamp('updated_at').default(sql`CURRENT_TIMESTAMP`),
+  createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const inventories = pgTable('inventories', {
+  id: serial('id').primaryKey(),
+  sku: varchar('sku', { length: 8 }).unique().notNull(),
+  orderId: integer('order_id').references(() => orders.id, { onDelete: 'set null' }),
+  warehouseId: integer('warehouse_id').references(() => warehouses.id, { onDelete: 'cascade' }),
+  productId: integer('product_id').references(() => products.id, { onDelete: 'cascade' }),
+  updatedAt: timestamp('updated_at').default(sql`CURRENT_TIMESTAMP`),
+  createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
+});
