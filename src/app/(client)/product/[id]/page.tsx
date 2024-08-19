@@ -202,7 +202,11 @@ const SingleProduct = () => {
                   className="h-9 border-brown-200 bg-white placeholder:text-gray-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brown-400 focus-visible:ring-offset-0"
                   placeholder="e.g. 1"
                   {...field}
-                  onChange={(e) => field.onChange(parseInt(e.target.value))}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    field.onChange(value > 0 ? value : 1); // Ensures qty is never 0 or less
+                  }}
+                  
                 />
               </FormControl>
               <FormMessage className="text-xs" />
