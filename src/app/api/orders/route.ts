@@ -1,6 +1,6 @@
 import { authOptions } from '@/lib/auth/authOptions';
 import { db } from '@/lib/db/db';
-import { deliveryPersons, inventories, orders, products, warehouses } from '@/lib/db/schema';
+import { deliveryPersons, inventories, orders, products, users, warehouses } from '@/lib/db/schema';
 import { orderSchema } from '@/lib/validators/orderSchema';
 import axios from 'axios';
 import { and, eq, inArray, isNull } from 'drizzle-orm';
@@ -14,6 +14,7 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_SECRET || 'rpYqwHsFChUEwLtqGgvaNazc',
 });
 
+// TO MAKE ORDER
 export async function POST(request: Request) {
   // Get the session
   const session = await getServerSession(authOptions);
@@ -157,4 +158,25 @@ export async function POST(request: Request) {
     amount: razorpayOrder.amount, // Order amount in paise
     currency: razorpayOrder.currency, // Order currency
   });
+}
+
+// TO LIST ORDERS
+ 
+export async function GET(request: Request){
+  // TODO : add authentication and authorization
+  // TODO : add login and error handling
+  const allOrders = await db.select({
+    id: orders.id,
+    product:products.name,
+    productId:products.id,
+    userId:users.id,
+    user:users.fname,
+    type:orders.type,
+    status:orders.status,
+    price:orders.price,
+    image:products.image,
+    address:orders.address,
+    createdAt:orders.createdAt
+  }).from(orders).leftJoin(products,eq(orders.productId,products.id)).leftJoin(users,eq(orders.userId,users.id))
+  return Response.json(allOrders)
 }
