@@ -1,4 +1,4 @@
-import {  InventoryData } from "@/types";
+import {  InventoryData, OrderData } from "@/types";
 import { api } from "./client";
 
 export const getAllProducts = async()=>{
@@ -82,3 +82,8 @@ export const getSingleProduct = async(id:string)=>{
    console.log(error);
   }
  }
+
+ export const placeOrder = async (data:OrderData)=>{
+  const response = await api.post(`/orders`,data);
+  return response.data;
+}

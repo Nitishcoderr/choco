@@ -51,6 +51,7 @@ export const orders = pgTable('orders', {
   address: text('address').notNull(),
   productId: integer('product_id').references(() => products.id, { onDelete: 'no action' }),
   qty: integer('qty').notNull(),
+  razorpayOrderId: varchar('razorpay_order_id', { length: 255 }).unique(),
   updatedAt: timestamp('updated_at').default(sql`CURRENT_TIMESTAMP`),
   createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
 });
