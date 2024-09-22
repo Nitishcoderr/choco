@@ -3,7 +3,7 @@ import { db } from '@/lib/db/db';
 import { deliveryPersons, inventories, orders, products, users, warehouses } from '@/lib/db/schema';
 import { orderSchema } from '@/lib/validators/orderSchema';
 import axios from 'axios';
-import { and, eq, inArray, isNull } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNull } from 'drizzle-orm';
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 import crypto from 'node:crypto';
@@ -177,6 +177,6 @@ export async function GET(request: Request){
     image:products.image,
     address:orders.address,
     createdAt:orders.createdAt
-  }).from(orders).leftJoin(products,eq(orders.productId,products.id)).leftJoin(users,eq(orders.userId,users.id))
+  }).from(orders).leftJoin(products,eq(orders.productId,products.id)).leftJoin(users,eq(orders.userId,users.id)).orderBy(desc(orders.id))
   return Response.json(allOrders)
 }
