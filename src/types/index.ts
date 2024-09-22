@@ -54,3 +54,16 @@ export interface InventoryData{
         prefill: { name: string; email: string; contact: string };
         theme: { color: string };
       }
+
+      export interface Order{
+        id: number,
+        product:string,
+        user:string,
+        type:string,
+        address:string,
+        status:string,
+        price:number,
+        qty:number,
+        order_id:string,
+        
+      }

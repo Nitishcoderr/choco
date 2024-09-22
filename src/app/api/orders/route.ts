@@ -141,13 +141,13 @@ export async function POST(request: Request) {
       amount: amount,
       currency: 'INR',
       receipt: `order_rcptid_${finalOrder.id}`,
-      payment_capture: true // Auto-capture payment
+      payment_capture: true, // Auto-capture payment
     });
-       // Update the order with the Razorpay order ID
-       await db
-       .update(orders)
-       .set({ razorpayOrderId: razorpayOrder.id }) // Store Razorpay order ID
-       .where(eq(orders.id, finalOrder.id));
+    // Update the order with the Razorpay order ID
+    await db
+      .update(orders)
+      .set({ razorpayOrderId: razorpayOrder.id }) // Store Razorpay order ID
+      .where(eq(orders.id, finalOrder.id));
   } catch (error) {
     console.error('Failed to create Razorpay order', error);
     return NextResponse.json({ message: 'Failed to create payment order' }, { status: 500 });
@@ -161,22 +161,33 @@ export async function POST(request: Request) {
 }
 
 // TO LIST ORDERS
- 
-export async function GET(request: Request){
+
+export async function GET(request: Request) {
   // TODO : add authentication and authorization
   // TODO : add login and error handling
-  const allOrders = await db.select({
-    id: orders.id,
-    product:products.name,
-    productId:products.id,
-    userId:users.id,
-    user:users.fname,
-    type:orders.type,
-    status:orders.status,
-    price:orders.price,
-    image:products.image,
-    address:orders.address,
-    createdAt:orders.createdAt
-  }).from(orders).leftJoin(products,eq(orders.productId,products.id)).leftJoin(users,eq(orders.userId,users.id)).orderBy(desc(orders.id))
-  return Response.json(allOrders)
+  const allOrders = await db
+    .select({
+      id: orders.id,
+      product: products.name,
+      productId: products.id,
+      userId: users.id,
+      user: users.fname,
+      type: orders.type,
+      order_id: orders.razorpayOrderId,
+      status: orders.status,
+      price: orders.price,
+      image: products.image,
+      address: orders.address,
+      qty: orders.qty,
+      createdAt: orders.createdAt,
+    })
+    .from(orders)
+    .leftJoin(products, eq(orders.productId, products.id))
+    .leftJoin(users, eq(orders.userId, users.id))
+    // TODO join inventories (orderID)
+    // TODO join delivery person (orderID)
+    // TODO join warehouse (delivery ID)
+    // TODO 1. use pagination 2. Put index
+    .orderBy(desc(orders.id));
+  return Response.json(allOrders);
 }

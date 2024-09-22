@@ -87,3 +87,13 @@ export const getSingleProduct = async(id:string)=>{
   const response = await api.post(`/orders`,data);
   return response.data;
 }
+
+export const getAllOrders = async(id:string)=>{
+  try {
+    const response =  await api.get(`/orders`);
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+   console.log(error);
+  }
+ }
