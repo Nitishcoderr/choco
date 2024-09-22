@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   // Get the session
   const session = await getServerSession(authOptions);
   if (!session) {
-    return NextResponse.json({ message: 'Not allowed' }, { status: 401 });
+    return Response.json({ message: 'Not allowed' }, { status: 401 });
   }
 
   // Parse and validate request data
@@ -28,19 +28,28 @@ export async function POST(request: Request) {
   try {
     validateData = await orderSchema.parse(requestData);
   } catch (error) {
-    return NextResponse.json({ message: 'Invalid data', error }, { status: 400 });
+    return Response.json({ message: error }, { status: 400 });
   }
 
-  // Fetch product details
-  const foundProduct = await db
-    .select()
-    .from(products)
-    .where(eq(products.id, validateData.productId))
-    .limit(1);
 
-  if (!foundProduct.length) {
-    return NextResponse.json({ message: 'Product not found' }, { status: 400 });
-  }
+  const warehouseResult = await db
+  .select({ id: warehouses.id })
+  .from(warehouses)
+  .where(eq(warehouses.pincode, validateData.pincode));
+
+if (!warehouseResult.length) {
+  return Response.json({ message: 'No warehouse found' }, { status: 400 });
+}
+
+const foundProduct = await db
+.select()
+.from(products)
+.where(eq(products.id, validateData.productId))
+.limit(1);
+
+if (!foundProduct.length) {
+return Response.json({ message: 'No product found' }, { status: 400 });
+}
 
   // Calculate total amount in paise
   const productPrice = foundProduct[0].price;
@@ -48,6 +57,7 @@ export async function POST(request: Request) {
 
   // Create order in the database
   let finalOrder;
+  let transactionError: string = '';
   try {
     finalOrder = await db.transaction(async (tx) => {
       const order = await tx
@@ -57,56 +67,51 @@ export async function POST(request: Request) {
           //  @ts-ignore
           userId: session.token.id,
           price: foundProduct[0].price * validateData.qty,
-          // Todo: move all status to enum or const
+          // TODO: move all status to enum or const
           status: 'received',
         })
         .returning({ id: orders.id, price: orders.price });
 
       // Perform inventory and delivery checks
-      // Fetch the warehouse details and check stock
-      const warehouseResult = await tx
-        .select({ id: warehouses.id })
-        .from(warehouses)
-        .where(eq(warehouses.pincode, validateData.pincode));
-
-      if (!warehouseResult.length) {
-        throw new Error('Warehouse not found');
-      }
 
       // Check stock availability
       const availableStock = await tx
-        .select()
-        .from(inventories)
-        .where(
-          and(
-            eq(inventories.warehouseId, warehouseResult[0].id),
-            eq(inventories.productId, validateData.productId),
-            isNull(inventories.orderId)
-          )
-        )
-        .limit(validateData.qty)
-        .for('update', { skipLocked: true });
+                .select()
+                .from(inventories)
+                .where(
+                    and(
+                        eq(inventories.warehouseId, warehouseResult[0].id),
+                        eq(inventories.productId, validateData.productId),
+                        isNull(inventories.orderId)
+                    )
+                )
+                .limit(validateData.qty)
+                .for('update', { skipLocked: true });
 
-      if (availableStock.length < validateData.qty) {
-        throw new Error(`Stock is low, only ${availableStock.length} products available`);
-      }
+            if (availableStock.length < validateData.qty) {
+                transactionError = `Stock is low, only ${availableStock.length} products available`;
+                tx.rollback();
+                return;
+            }
 
       // Check for available delivery persons
       const availablePersons = await tx
-        .select()
-        .from(deliveryPersons)
-        .where(
+      .select()
+      .from(deliveryPersons)
+      .where(
           and(
-            isNull(deliveryPersons.orderId),
-            eq(deliveryPersons.warehouseId, warehouseResult[0].id)
+              isNull(deliveryPersons.orderId),
+              eq(deliveryPersons.warehouseId, warehouseResult[0].id)
           )
-        )
-        .for('update')
-        .limit(1);
+      )
+      .for('update')
+      .limit(1);
 
-      if (!availablePersons.length) {
-        throw new Error('No delivery person available at the moment');
-      }
+  if (!availablePersons.length) {
+      transactionError = `Delivery person is not available at the moment`;
+      tx.rollback();
+      return;
+  }
 
       // Update inventories and delivery persons
       await tx
@@ -130,9 +135,15 @@ export async function POST(request: Request) {
       return order[0];
     });
   } catch (error) {
-    console.error('Database transaction error:', error);
-    return NextResponse.json({ message: 'Error while processing order' }, { status: 500 });
-  }
+    // log
+    // in production -> be careful don't return internal errors to the client.
+    return Response.json(
+        {
+            message: transactionError ? transactionError : 'Error while db transaction',
+        },
+        { status: 500 }
+    );
+}
 
   // Create a Razorpay order
   let razorpayOrder;
@@ -140,6 +151,7 @@ export async function POST(request: Request) {
     razorpayOrder = await razorpay.orders.create({
       amount: amount,
       currency: 'INR',
+      //  @ts-ignore
       receipt: `order_rcptid_${finalOrder.id}`,
       payment_capture: true, // Auto-capture payment
     });
@@ -147,9 +159,10 @@ export async function POST(request: Request) {
     await db
       .update(orders)
       .set({ razorpayOrderId: razorpayOrder.id }) // Store Razorpay order ID
+      //  @ts-ignore
       .where(eq(orders.id, finalOrder.id));
   } catch (error) {
-    console.error('Failed to create Razorpay order', error);
+    console.error('Failed to create Razorpay order');
     return NextResponse.json({ message: 'Failed to create payment order' }, { status: 500 });
   }
 

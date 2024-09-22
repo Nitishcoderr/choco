@@ -60,37 +60,28 @@ const SingleProduct = () => {
     queryFn: () => getSingleProduct(id as string),
   });
 
-  const {mutate} = useMutation({
-    mutationKey : ["order"],
-    mutationFn:(data:FormValues) => placeOrder({...data,productId:Number(id)}),
-    onSuccess:(data)=>{
-      window.location.href = data.paymentUrl;
+  const { mutate } = useMutation({
+    mutationKey: ['order'],
+    mutationFn: (data: FormValues) => placeOrder({ ...data, productId: Number(id) }),
+    onSuccess: (data) => {
+        window.location.href = data.paymentUrl;
     },
-    onError:(err:AxiosError)=>{
-      if(err.response?.data){
-        const customErr = err.response.data as CustomError;
-        console.error(customErr.message);
-        toast(({ 
-          title: customErr.message,
-          color:'red',
-        }))
-        
-      }else{
-        console.error(err);
-        toast(({ 
-          title: 'Unknown error',
-          color:'red',
-        }))
-      }
-    }
-  })
+    onError: (err: AxiosError) => {
+        if (err.response?.data) {
+            const customErr = err.response.data as CustomError;
+            console.error(customErr.message);
+            toast({
+                title: customErr.message,
+                color: 'red',
+            });
+        } else {
+            console.error(err);
+            toast({ title: 'Unknown error' });
+        }
+    },
+});
 
   type FormValues = z.infer<typeof orderSchema>;
-  // const onSubmit = (values: FormValues) => {
-  //   // Submit the form
-  //   console.log(values);
-  //   mutate(values)
-  // };
 
   const loadRazorpayScript = () => {
     return new Promise((resolve, reject) => {
@@ -109,6 +100,7 @@ const SingleProduct = () => {
   
       // Call backend to create an order
       const { data: order } = await axios.post('/api/orders', values);
+      mutate(values);
   
       console.log(order);
   
@@ -160,6 +152,7 @@ const SingleProduct = () => {
         throw new Error('Razorpay instance does not have an open method.');
       }
     } catch (error) {
+      mutate(values);
       console.error('Payment failed', error);
     }
   };
