@@ -1,4 +1,4 @@
-import {  InventoryData, OrderData } from "@/types";
+import {  InventoryData, OrderData, OrderStatusData } from "@/types";
 import { api } from "./client";
 
 export const getAllProducts = async()=>{
@@ -91,6 +91,16 @@ export const getSingleProduct = async(id:string)=>{
 export const getAllOrders = async(id:string)=>{
   try {
     const response =  await api.get(`/orders`);
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+   console.log(error);
+  }
+ }
+
+ export const changeOrderStatus = async (data:OrderStatusData)=>{
+  try {
+    const response =  await api.patch(`/orders/status`,data);
     console.log(response.data);
     return response.data;
   } catch (error) {

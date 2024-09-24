@@ -3,6 +3,7 @@
 import {  Order } from '@/types'
 import {ColumnDef} from '@tanstack/react-table'
 import StatusBadge from './status-badge';
+import StatusChanger from './status-changer';
 
 export const columns:ColumnDef<Order>[] = [
     {
@@ -30,11 +31,20 @@ export const columns:ColumnDef<Order>[] = [
         header: 'Order Id',
     },
     {
+        id:"status",
+        header:"Status",
+        cell: ({ row }) => {
+          {
+            return <StatusBadge status={row.original.status} />
+          }
+        }
+      },
+    {
       id:"status",
-      header:"Status",
+      header:"Action",
       cell: ({ row }) => {
         {
-          return <StatusBadge status={row.original.status} />
+          return <StatusChanger orderId={row.original.id} currentStatus={row.original.status} />
         }
       }
     },

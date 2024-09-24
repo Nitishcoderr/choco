@@ -67,3 +67,8 @@ export interface InventoryData{
         order_id:string,
         
       }
+
+      export interface OrderStatusData{
+        orderId:number;
+        status:string;
+      }
