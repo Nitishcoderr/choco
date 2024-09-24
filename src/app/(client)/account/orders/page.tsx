@@ -3,12 +3,12 @@
 import { getMyOrders } from '@/http/api';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
-import Header from '../_components/header';
 import Image from 'next/image';
 import { Separator } from '@/components/ui/separator';
 import { Card } from '@/components/ui/card';
 import { CircleCheck, Loader2 } from 'lucide-react';
 import { MyOrder } from '@/types';
+import Header from '../../_components/header';
 
 const MyOrderPage = () => {
   const { data: myOrders,isLoading,isError } = useQuery<MyOrder[]>({
