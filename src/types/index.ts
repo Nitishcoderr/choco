@@ -72,3 +72,15 @@ export interface InventoryData{
         orderId:number;
         status:string;
       }
+
+      export interface MyOrder{
+        id:number,
+        products:string,
+        type:string,
+        price:number,
+        image:string,
+        productDescription:string,
+        status:string,
+        address:string,
+        createdAt:string,
+      }

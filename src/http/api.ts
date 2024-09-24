@@ -107,3 +107,13 @@ export const getAllOrders = async(id:string)=>{
    console.log(error);
   }
  }
+
+ export const getMyOrders = async(id:string)=>{
+  try {
+    const response =  await api.get(`/orders/history`);
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+   console.log(error);
+  }
+ }
