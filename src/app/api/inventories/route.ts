@@ -1,9 +1,20 @@
+import { authOptions } from "@/lib/auth/authOptions";
 import { db } from "@/lib/db/db";
 import { inventories, products, warehouses } from "@/lib/db/schema";
 import { inventorySchema } from "@/lib/validators/inventoriesSchema";
 import { desc, eq } from "drizzle-orm";
+import { getServerSession } from "next-auth";
 
 export async function POST(request:Request) {
+   //  check user access
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return Response.json({ message: 'Not allowed' }, { status: 401 });
+  }
+  // @ts-ignore
+  if(session.token.role !== 'admin'){
+    return Response.json({ message: 'Not allowed' }, { status: 403 });
+  }
      const requestData = await request.json();
      let validateData;
      try {

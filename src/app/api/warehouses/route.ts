@@ -1,9 +1,19 @@
+import { authOptions } from '@/lib/auth/authOptions';
 import { db } from '@/lib/db/db';
 import { warehouses } from '@/lib/db/schema';
 import { warehouseSchema } from '@/lib/validators/warehouseSchema';
+import { getServerSession } from 'next-auth';
 
 export async function POST(request: Request) {
-  // TODO Auth check
+  //  check user access
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return Response.json({ message: 'Not allowed' }, { status: 401 });
+  }
+  // @ts-ignore
+  if(session.token.role !== 'admin'){
+    return Response.json({ message: 'Not allowed' }, { status: 403 });
+  }
   const requestData = await request.json();
 
   let validateData;

@@ -1,13 +1,23 @@
+import { authOptions } from '@/lib/auth/authOptions';
 import { db } from '@/lib/db/db';
 import { products } from '@/lib/db/schema';
 import { productSchema } from '@/lib/validators/productSchema';
 import { desc } from 'drizzle-orm';
+import { getServerSession } from 'next-auth';
 import { unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 // CREATE PRODUCTS
 export async function POST(request: Request) {
-  // TODO : check user access
+//  check user access
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return Response.json({ message: 'Not allowed' }, { status: 401 });
+  }
+  // @ts-ignore
+  if(session.token.role !== 'admin'){
+    return Response.json({ message: 'Not allowed' }, { status: 403 });
+  }
   const data = await request.formData();
   let validatedData;
   try {
@@ -20,10 +30,11 @@ export async function POST(request: Request) {
   } catch (error) {
     return Response.json({ message: error }, { status: 400 });
   }
-
+ // @ts-ignore
   const filename = `${Date.now()}.${validatedData.image.name.split('.').slice(-1)}`; //34234234234.jpg
 
   try {
+     // @ts-ignore
     const buffer = Buffer.from(await validatedData.image.arrayBuffer());
     await writeFile(path.join(process.cwd(), 'public/assets', filename), buffer);
   } catch (error) {
